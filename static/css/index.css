@@ -200,6 +200,13 @@ body {
   border-radius: 5px;
 }
 
+/* Make selected figures full width on mobile while keeping desktop sizes */
+@media (max-width: 768px) {
+  .mobile-fullwidth {
+    max-width: 100% !important;
+  }
+}
+
 
 .has-bg-img { 
   background: url('/static/images/toss.jpeg')center center;

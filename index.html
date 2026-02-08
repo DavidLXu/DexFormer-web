@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="DexFormer: Cross-Embodied Dexterous Manipulation via History-Conditioned Transformer">
+  <meta name="keywords" content="Dexterous Manipulation, Cross-Embodiment, Reinforcement Learning, Robotics, Transformer Policy">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DexFormer: Cross-Embodied Dexterous Manipulation</title>
+
+  <link rel="icon" type="image/svg" href="./static/images/logo.svg" />
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script src="https://kit.fontawesome.com/19914a84eb.js" crossorigin="anonymous"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const burger = document.querySelector('.navbar-burger');
+      const menu = document.getElementById('navMenu');
+      if (burger && menu) {
+        burger.addEventListener('click', () => {
+          burger.classList.toggle('is-active');
+          menu.classList.toggle('is-active');
+        });
+      }
+    });
+  </script>
+</head>
+<body>
+  <section class="hero is-fullheight hero-cover" id="top" style="background-image: linear-gradient(115deg, rgba(8,16,38,0.82), rgba(12,38,71,0.6)), url('./static/images/dexformer/testing.png'); background-size: cover; background-position: center;">
+    <div class="hero-head">
+      <header class="navbar is-transparent">
+        <div class="container">
+          <div class="navbar-brand">
+            <span class="navbar-item is-size-5 has-text-weight-semibold">DexFormer</span>
+            <span class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </div>
+          <div id="navMenu" class="navbar-menu">
+            <div class="navbar-end">
+              <a class="navbar-item" href="./static/paper/dexformer.pdf">Paper PDF</a>
+              <a class="navbar-item" href="#overview">Overview</a>
+              <a class="navbar-item" href="#method">Method</a>
+              <a class="navbar-item" href="#results">Results</a>
+              <a class="navbar-item" href="#realworld">Real-World</a>
+              <a class="navbar-item" href="#bibtex">BibTeX</a>
+            </div>
+          </div>
+        </div>
+      </header>
+    </div>
+
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <!-- <p class="subtitle is-5 has-text-white" style="font-weight: 700;">Cross-Embodied Dexterous Manipulation</p> -->
+        <h1 class="title is-0 publication-title has-text-white is-size-2-mobile" style="font-weight: 800; color: #ffffff;">DexFormer</h1>
+        <h2 class="subtitle is-2 has-text-white is-size-5-mobile" style="max-width: 880px; margin: 0 auto; font-weight: 700; color: #ffffff;">
+          Cross-Embodied Dexterous Manipulation <br> via History-Conditioned Transformer
+        </h2>
+        <div class="buttons is-centered mt-4">
+          <a class="button is-primary is-medium" href="./static/paper/dexformer.pdf">
+            <span class="icon"><i class="ai ai-arxiv"></i></span><span>Paper PDF</span>
+          </a>
+          <a class="button is-light is-medium" href="#bibtex">BibTeX</a>
+        </div>
+        <div class="columns is-centered mt-5 is-variable is-4">
+          <div class="column is-narrow">
+            <div class="stat-pill">300 randomized training embodiments</div>
+          </div>
+          <div class="column is-narrow">
+            <div class="stat-pill">Zero-shot to LEAP / Allegro / RAPID</div>
+          </div>
+          <div class="column is-narrow">
+            <div class="stat-pill">Real-world LEAP hand on Franka</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-foot">
+      <nav class="tabs is-boxed is-fullwidth is-size-6">
+        <div class="container">
+          <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#method">Method</a></li>
+            <li><a href="#training">Training</a></li>
+            <li><a href="#results">Results</a></li>
+            <li><a href="#realworld">Real-World</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </section>
+
+  <section class="section is-small" id="overview">
+    <div class="container is-max-desktop">
+      <!-- <h2 class="title is-1 has-text-centered is-size-3-mobile">DexFormer at a Glance</h2> -->
+      <figure class="image">
+        <video class="is-fullwidth" src="./static/videos/dexformer-demo-video.mp4" controls muted loop playsinline style="width: 100%; border-radius: 12px;"></video>
+        <figcaption class="has-text-grey has-text-centered mt-2">A history-conditioned policy transfers dexterous grasping across diverse hand embodiments.</figcaption>
+      </figure>
+      <div class="content mt-4">
+        <p>
+          Dexterous manipulation suffers from embodiment-specific dynamics: every new hand typically needs retuning or retraining. DexFormer builds an embodiment-agnostic transformer policy that conditions on recent observation history to implicitly infer morphology and produce embodiment-appropriate actions without identifiers or per-hand heads.
+        </p>
+      </div>
+      <div class="columns is-multiline mt-4">
+        <div class="column is-one-third">
+          <div class="info-card">
+            <p class="heading">History-Conditioned</p>
+            <p>Temporal tokens let the transformer infer hand dynamics online, avoiding explicit morphology codes.</p>
+          </div>
+        </div>
+        <div class="column is-one-third">
+          <div class="info-card">
+            <p class="heading">Shared Action Space</p>
+            <p>Canonical finger embedding aligns actuators across hands while zero-padding missing joints.</p>
+          </div>
+        </div>
+        <div class="column is-one-third">
+          <div class="info-card">
+            <p class="heading">Scaling Across Morphologies</p>
+            <p>Trained on 300 randomized embodiments, evaluated zero-shot on standard LEAP, Allegro, and RAPID hands and 32 novel variants.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-small" id="method">
+    <div class="container is-max-desktop">
+      <h2 class="title is-1 has-text-centered is-size-3-mobile">Method</h2>
+      <div class="columns is-variable is-5 is-vcentered">
+        <div class="column is-one-third">
+          <figure class="image">
+            <img src="./static/images/dexformer/shared-action-light.png" alt="Canonical shared action space" />
+          </figure>
+        </div>
+        <div class="column is-two-thirds">
+          <figure class="image">
+            <img src="./static/images/dexformer/action-mask-light.png" alt="Embodiment masks" />
+          </figure>
+        </div>
+      </div>
+      <p class="has-text-grey has-text-centered mt-2">
+        Canonical 20-D action space: identical anatomical joints map to fixed indices; lower-DoF hands zero-pad unused slots.
+      </p>
+      <div class="content mt-4">
+        <p>
+          DexFormer unifies heterogeneous hands with a shared finger action space: joints with the same anatomical role (MCP abduction/flexion, PIP/DIP flexion, thumb CMC/IP) occupy fixed canonical indices. Each embodiment writes its native joint commands into those slots and zero-pads missing joints; masks ensure only valid dimensions are applied. This alignment lets one policy head emit a single 20-D finger command vector that works across LEAP, Allegro, RAPID, and their randomized variants.
+        </p>
+      </div>
+      <div class="columns is-vcentered is-variable is-6 mt-5">
+        
+        <div class="column">
+          
+          <figure class="image mt-3" style="max-width: 50%; margin: 0 auto;">
+            <img src="./static/images/dexformer/transformer.png" alt="History-conditioned transformer" />
+            <figcaption class="has-text-grey mt-2">History-conditioned transformer with causal masking.</figcaption>
+          </figure>
+          <div class="content mt-4">
+            <p>
+              The policy consumes a fixed horizon of observation history and passes it through a causal transformer encoder. The final MLP layer outputs the shared action; embodiment masks and smoothing translate it to joint targets.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-small has-background-light" id="training">
+    <div class="container is-max-desktop">
+      <h2 class="title is-1 has-text-centered is-size-3-mobile">Training Setup</h2>
+      <div class="columns is-variable is-5">
+        <div class="column">
+          <figure class="image">
+            <img src="./static/images/dexformer/training_blue.png" alt="Training embodiments" />
+            <figcaption class="has-text-grey mt-2">Training set: 300 randomized embodiments.</figcaption>
+          </figure>
+        </div>
+        <div class="column">
+          <figure class="image">
+            <img src="./static/images/dexformer/testing.png" alt="Testing embodiments" />
+            <figcaption class="has-text-grey mt-2">Evaluation set: 96 randomized embodiments for zero-shot.</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="columns is-centered mt-4">
+        <div class="column is-three-quarters">
+          <figure class="image" style="max-width: 70%; margin: 0 auto;">
+            <img src="./static/images/dexformer/all-reduce.png" alt="Distributed training" />
+            <figcaption class="has-text-grey mt-2 has-text-centered">Distributed rollouts and synchronized updates across embodiment groups.</figcaption>
+          </figure>
+          <div class="content has-text-centered mt-3">
+            <ul class="is-inline-block has-text-left">
+              <li>300 procedurally randomized embodiments built from LEAP, Allegro, and RAPID canonical hands.</li>
+              <li>Training in Isaac Lab with automatic domain randomization and 4096 parallel environments.</li>
+              <li>Embodiment groups assigned per GPU; gradients synchronized via Distributed Data Parallel all-reduce.</li>
+              <li>Reward combines smooth actions, approach, grasp contact, contact-aware pose tracking, and stability terms.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-small" id="results">
+    <div class="container is-max-desktop">
+      <h2 class="title is-1 has-text-centered is-size-3-mobile">Results</h2>
+      <div class="columns is-variable is-4">
+        <div class="column">
+          <figure class="image">
+            <img src="./static/images/dexformer/Success_rate_compare.png" alt="Success rates" />
+            <figcaption class="has-text-grey has-text-centered mt-2">Success rate.</figcaption>
+          </figure>
+        </div>
+        <div class="column">
+          <figure class="image">
+            <img src="./static/images/dexformer/ADR_compare.png" alt="Automatic Domain Randomization rate" />
+            <figcaption class="has-text-grey has-text-centered mt-2">ADR rate.</figcaption>
+          </figure>
+        </div>
+        <div class="column">
+          <figure class="image">
+            <img src="./static/images/dexformer/Mean_reward_compare.png" alt="Reward terms" />
+            <figcaption class="has-text-grey has-text-centered mt-2">Mean reward.</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="columns is-variable is-4 mt-4">
+        <div class="column has-text-centered">
+          <video controls style="width: 100%; max-width: 360px; border-radius: 10px;">
+            <source src="./static/videos/simulation_dexformer-1.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="has-text-grey mt-2">LEAP canonical & variants evaluation</div>
+        </div>
+        <div class="column has-text-centered">
+          <video controls style="width: 100%; max-width: 360px; border-radius: 10px;">
+            <source src="./static/videos/simulation_dexformer-2.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="has-text-grey mt-2">Allegro canonical & variants evaluation</div>
+        </div>
+        <div class="column has-text-centered">
+          <video controls style="width: 100%; max-width: 360px; border-radius: 10px;">
+            <source src="./static/videos/simulation_dexformer-3.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="has-text-grey mt-2">RAPID canonical & variants evaluation</div>
+        </div>
+      </div>
+      
+      <div class="content mt-4">
+        <ul>
+          <!-- <li>After 40k episodes DexFormer achieves 77.5% average success, surpassing LSTM (58.7%) and GRU (44.3%).</li> -->
+          <!-- <li><strong>History helps:</strong> Using 5-step history improves zero-shot success on LEAP (86.8% vs 83.3%) and Allegro (71.9% vs 55.2%).</li>
+          <li><strong>Morphology diversity:</strong> Training with 100 embodiments lifts average success to 84.1%, showing performance scales with embodiment variety.</li>
+          <li><strong>Parallelism:</strong> Increasing environments per GPU (4096) boosts performance on LEAP and Allegro while maintaining strong averages.</li> -->
+        </ul>
+      </div>
+      <div class="box mt-4">
+        <!-- <p class="has-text-centered has-text-weight-semibold mb-3">Comparison with LSTM and GRU-based baselines</p> -->
+        <div class="table-container">
+          <table class="table is-fullwidth is-striped is-hoverable is-bordered">
+            <thead>
+              <tr>
+                <th>Hand</th>
+                <th>Setting</th>
+                <th>LSTM</th>
+                <th>GRU</th>
+                <th class="has-background-light">Ours</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="2">LEAP</td>
+                <td>canonical</td>
+                <td>66.81</td>
+                <td>58.91</td>
+                <td class="has-text-weight-semibold has-background-warning-light">83.25</td>
+              </tr>
+              <tr>
+                <td>32 variants</td>
+                <td>66.72</td>
+                <td>57.38</td>
+                <td class="has-text-weight-semibold has-background-warning-light">86.84</td>
+              </tr>
+              <tr>
+                <td rowspan="2">Allegro</td>
+                <td>canonical</td>
+                <td>65.38</td>
+                <td>25.81</td>
+                <td class="has-text-weight-semibold has-background-warning-light">74.19</td>
+              </tr>
+              <tr>
+                <td>32 variants</td>
+                <td>62.44</td>
+                <td>24.97</td>
+                <td class="has-text-weight-semibold has-background-warning-light">71.94</td>
+              </tr>
+              <tr>
+                <td rowspan="2">RAPID</td>
+                <td>canonical</td>
+                <td>46.72</td>
+                <td>45.06</td>
+                <td class="has-text-weight-semibold has-background-warning-light">71.69</td>
+              </tr>
+              <tr>
+                <td>32 variants</td>
+                <td>44.22</td>
+                <td>53.59</td>
+                <td class="has-text-weight-semibold has-background-warning-light">77.09</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-semibold">Average</td>
+                <td>Combined</td>
+                <td>58.72</td>
+                <td>44.29</td>
+                <td class="has-text-weight-semibold has-background-warning-light">77.50</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-small has-background-light" id="realworld">
+    <div class="container is-max-desktop">
+      <h2 class="title is-1 has-text-centered is-size-3-mobile">Real-World Evaluation</h2>
+      <div class="content has-text-centered">
+        <ul class="is-inline-block has-text-left">
+          <li>Point-cloud from two Intel RealSense D435 cameras fused with ICP to match simulated point-cloud.</li>
+          <li>Franka joint-space controller at 1000 Hz; policy evaluated at 10 Hz.</li>
+          <li>Videos showcasing policy rollouts at original speed.</li>
+        </ul>
+      </div>
+      <div class="has-text-centered mt-5">
+        <figure class="image" style="max-width: 60%; margin: 0 auto;">
+          <img src="./static/images/dexformer/realworld_objects.jpg" alt="Real-world object set for evaluation" />
+          <figcaption class="has-text-grey mt-2">Physical object set used in real-world evaluation: polyhedra, RealSense camera box, mug, plush toys, orange, and block.</figcaption>
+        </figure>
+      </div>
+      <div class="columns is-multiline is-variable is-4 mt-4">
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/orange.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">Orange fruit.</figcaption>
+          </figure>
+        </div>
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/red_mug.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">Red mug.</figcaption>
+          </figure>
+        </div>
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/yellow_block.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">Yellow block.</figcaption>
+          </figure>
+        </div>
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/12_faced.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">Dodecahedron (12-faced polyhedron).</figcaption>
+          </figure>
+        </div>
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/20_faced.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">Icosahedron (20-faced polyhedron).</figcaption>
+          </figure>
+        </div>
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/hamster.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">Large hamster toy.</figcaption>
+          </figure>
+        </div>
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/realsense_left.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">Package box put to the left.</figcaption>
+          </figure>
+        </div>
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/realsense_mid.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">Package box put in the middle.</figcaption>
+          </figure>
+        </div>
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/realsense_right.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">Package put to the right.</figcaption>
+          </figure>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  <section class="section is-small has-background-light" id="realworld-adaptation">
+    <div class="container is-max-desktop">
+      <h2 class="title is-1 has-text-centered is-size-3-mobile">Real-World Adaptation</h2>
+      <div class="has-text-centered mt-4">
+        <figure class="image" style="max-width: 80%; margin: 0 auto;">
+          <img src="./static/images/dexformer/leap_variants_top.png" alt="LEAP hand variants with reduced DoFs" />
+          <figcaption class="has-text-grey mt-2">Real-world LEAP hand variants with progressively reduced degrees of freedom: (left) 1 DoF removed, (center) 2 DoFs removed, (right) 3 DoFs removed.</figcaption>
+        </figure>
+      </div>
+      <div class="columns is-variable is-4 mt-4">
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/cut_fingers-1.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">LEAP variant with 1 DoF removed.</figcaption>
+          </figure>
+        </div>
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/cut_fingers-2.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">LEAP variant with 2 DoFs removed.</figcaption>
+          </figure>
+        </div>
+        <div class="column is-one-third">
+          <figure class="image">
+            <video class="is-fullwidth" src="./static/videos/cut_fingers-3.mp4" controls muted loop playsinline style="width: 100%; border-radius: 8px;"></video>
+            <figcaption class="has-text-grey mt-2">LEAP variant with 3 DoFs removed.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-small" id="bibtex">
+    <div class="container is-max-desktop">
+      <h2 class="title is-1 has-text-centered is-size-3-mobile">Resources &amp; BibTeX</h2>
+      <div class="box">
+        <p class="mb-3">Preprint PDF: <a href="./static/paper/dexformer.pdf">dexformer.pdf</a></p>
+        <pre><code>@article{dexformer2026,
+  title={DexFormer: Cross-Embodied Dexterous Manipulation via History-Conditioned Transformer},
+  author={Ke Zhang, Lixin Xu, Chengyi Song, Junzhe Xu, Xiaoyi Lin, Zeyu Jiang, Renjing Xu},
+  journal={preprint},
+  year={2026}
+}</code></pre>
+        <p class="mt-3">Questions? Drop a note in the repo or contact the paper authors.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              Website template modified from <a href="https://umi-on-legs.github.io/">UMI on Legs</a>, <a href="https://psi-lab.ai/SkillBlender-web/">SkillBlender</a>, and <a href="https://nerfies.github.io/">NeRFies</a>.
+            </p>
+            <p>
+              This website is licensed under a <a rel="license"
+                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+                Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+            <p>
+              This means you are free to borrow and modify the <a
+                href="https://github.com/nerfies/nerfies.github.io">source
+                code</a> of this website as long as
+              you link back to the <a href="https://nerfies.github.io/">NeRFies</a> page in the footer.
+              Please remember to remove the analytics code included in the header of the website which
+              you do not want on your website.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -478,10 +478,35 @@
               Please remember to remove the analytics code included in the header of the website which
               you do not want on your website.
             </p>
+            <div class="has-text-centered mt-5">
+              <span class="tag is-info is-medium">Visitors:&nbsp;<span id="view-count">--</span></span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </footer>
+  <script>
+    // Simple view counter via countapi.xyz (no backend needed)
+    (function () {
+      const el = document.getElementById('view-count');
+      if (!el) return;
+      const namespace = 'dexformer-web';
+      const key = encodeURIComponent(location.hostname + location.pathname);
+      const url = `https://api.countapi.xyz/hit/${namespace}/${key}`;
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && typeof data.value === 'number') {
+            el.textContent = data.value.toLocaleString();
+          } else {
+            el.textContent = '?';
+          }
+        })
+        .catch(() => {
+          el.textContent = '?';
+        });
+    })();
+  </script>
 </body>
 </html>

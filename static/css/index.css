@@ -126,6 +126,22 @@ body {
   display: inline-block;
 }
 
+.author-line,
+.author-affil,
+.author-note {
+  margin: 0.1rem 0;
+  font-weight: 500;
+}
+
+.author-line sup,
+.author-affil sup,
+.author-note sup {
+  font-size: 0.7em;
+  vertical-align: baseline;
+  position: relative;
+  top: -0.1em;
+}
+
 .publication-banner img {
 }
 

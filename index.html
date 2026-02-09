@@ -63,6 +63,17 @@
         <h2 class="subtitle is-2 has-text-white is-size-5-mobile" style="max-width: 880px; margin: 0 auto; font-weight: 700; color: #ffffff;">
           Cross-Embodied Dexterous Manipulation <br> via History-Conditioned Transformer
         </h2>
+        <div class="author-block mt-3">
+          <p class="author-line has-text-white is-size-6-mobile">
+            Ke Zhang<sup>1*</sup>, Lixin Xu<sup>1*</sup>, Chengyi Song<sup>1</sup>, Junzhe Xu<sup>1</sup>, Xiaoyi Lin<sup>2</sup>, Zeyu Jiang<sup>1</sup>, Renjing Xu<sup>1†</sup>
+          </p>
+          <p class="author-affil has-text-white is-size-7-mobile">
+            <sup>1</sup>The Hong Kong University of Science and Technology (Guangzhou), <sup>2</sup>Wuhan University
+          </p>
+          <p class="author-note has-text-white is-size-7-mobile">
+            <sup>*</sup>Equal contribution, <sup>†</sup>Corresponding author
+          </p>
+        </div>
         <div class="buttons is-centered mt-4">
           <a class="button is-primary is-medium" href="./static/paper/dexformer.pdf">
             <span class="icon"><i class="ai ai-arxiv"></i></span><span>Paper PDF</span>
@@ -160,7 +171,7 @@
         
         <div class="column">
           
-          <figure class="image mt-3" style="max-width: 50%; margin: 0 auto;">
+          <figure class="image mt-3 mobile-fullwidth" style="max-width: 50%; margin: 0 auto;">
             <img src="./static/images/dexformer/transformer.png" alt="History-conditioned transformer" />
             <figcaption class="has-text-grey mt-2">History-conditioned transformer with causal masking.</figcaption>
           </figure>
@@ -193,7 +204,7 @@
       </div>
       <div class="columns is-centered mt-4">
         <div class="column is-three-quarters">
-          <figure class="image" style="max-width: 70%; margin: 0 auto;">
+          <figure class="image mobile-fullwidth" style="max-width: 70%; margin: 0 auto;">
             <img src="./static/images/dexformer/all-reduce.png" alt="Distributed training" />
             <figcaption class="has-text-grey mt-2 has-text-centered">Distributed rollouts and synchronized updates across embodiment groups.</figcaption>
           </figure>
